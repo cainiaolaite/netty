@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>使用HTML5的web socket来连接服务器</title>
+</head>
+
+<body>
+
+
+<div>
+
+    <textarea id="inputContent" style="width:400px;height: 500px;">
+
+    </textarea>
+    <input type="button" onclick="send()" value="发送信息">
+
+    <textarea id="showServerContent" style="width:400px;height: 500px;">
+
+    </textarea>
+    <input type="button" onclick="clearInfo()" value="清空信息">
+</div>
+
+
+
+
+</body>
+<script type="text/javascript">
+    var webSocketObject = null
+    if("WebSocket" in window){
+        // 打开一个 web socket
+        var webSocketObject = new WebSocket("ws://localhost:2020/ws");
+        webSocketObject.onclose = function(){
+            var value = document.getElementById("showServerContent").value;
+            document.getElementById("showServerContent").value = value + "\n" + "与服务器断开连接";
+        }
+        webSocketObject.onopen = function(){
+            var value = document.getElementById("showServerContent").value;
+            document.getElementById("showServerContent").value = value + "\n" + "与服务器建立连接";
+        }
+
+        webSocketObject.onmessage = function(evt){
+            var received_msg = evt.data;
+            var value = document.getElementById("showServerContent").value;
+            document.getElementById("showServerContent").value = value + "\n" + received_msg;
+        }
+    }
+
+    function clearInfo() {
+        document.getElementById("showServerContent").value = "";
+    }
+
+    function send(){
+        if(webSocketObject != null){
+            webSocketObject.send(document.getElementById("inputContent").value);
+            document.getElementById("inputContent").value = "";
+        }else {
+            alert("浏览器不支持webSocket,不支持html5")
+        }
+    }
+
+
+</script>
+</html>
